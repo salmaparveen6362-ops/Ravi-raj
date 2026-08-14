@@ -226,6 +226,7 @@
     ::-webkit-scrollbar-thumb:hover{background:#64748b;}
   </style>
 <base target="_blank">
+<base target="_blank">
 </head>
 <body>
 
@@ -676,8 +677,8 @@
             </select>
           </div>
           <div class="col-12">
-            <label class="form-label">District *</label>
-            <input id="inp_district" type="text" class="form-control" required placeholder="Enter your district (e.g. Ahmedabad, Surat)">
+            <label class="form-label">State *</label>
+            <input id="inp_state" type="text" class="form-control" required placeholder="Enter your state (e.g. Gujarat, Maharashtra)">
           </div>
           <div class="col-12">
             <button type="submit" class="btn-submit">
@@ -822,10 +823,10 @@ mainForm.addEventListener('submit', function(e) {
   const age = document.getElementById('inp_age').value;
   const gender = document.getElementById('inp_gender').value;
   const profession = document.getElementById('inp_profession').value;
-  const district = document.getElementById('inp_district').value.trim();
+  const state = document.getElementById('inp_state').value.trim();
   const source = sourceInfo.value || 'Website';
 
-  if (!name || phone.length < 10 || !age || !gender || !profession || !district) {
+  if (!name || phone.length < 10 || !age || !gender || !profession || !state) {
     alert('Please fill all fields correctly with a valid 10-digit phone number.');
     return;
   }
@@ -836,7 +837,7 @@ mainForm.addEventListener('submit', function(e) {
   formData.append('age', age);
   formData.append('gender', gender);
   formData.append('profession', profession);
-  formData.append('district', district);
+  formData.append('state', state);
   formData.append('source', source);
   formData.append('timestamp', new Date().toISOString());
 
