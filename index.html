@@ -815,22 +815,38 @@ document.addEventListener('click', e => {
   }
 });
 
-mainForm.addEventListener('submit', function(e) {
-  e.preventDefault();
+// Bind both form submit AND button click for maximum compatibility
+function handleFormSubmit(e) {
+  if (e) e.preventDefault();
 
-  const name = document.getElementById('inp_name').value.trim();
-  const phone = document.getElementById('inp_phone').value.replace(/\D/g, '');
-  const age = document.getElementById('inp_age').value;
-  const gender = document.getElementById('inp_gender').value;
-  const profession = document.getElementById('inp_profession').value;
-  const state = document.getElementById('inp_state').value.trim();
-  const source = sourceInfo.value || 'Website';
+  const nameEl = document.getElementById('inp_name');
+  const phoneEl = document.getElementById('inp_phone');
+  const ageEl = document.getElementById('inp_age');
+  const genderEl = document.getElementById('inp_gender');
+  const professionEl = document.getElementById('inp_profession');
+  const stateEl = document.getElementById('inp_state');
 
-  if (!name || phone.length < 10 || !age || !gender || !profession || !state) {
-    alert('Please fill all fields correctly with a valid 10-digit phone number.');
+  if (!nameEl || !phoneEl || !ageEl || !genderEl || !professionEl || !stateEl) {
+    alert('Form elements not found. Please refresh the page.');
     return;
   }
 
+  const name = nameEl.value.trim();
+  const phone = phoneEl.value.replace(/\D/g, '');
+  const age = ageEl.value;
+  const gender = genderEl.value;
+  const profession = professionEl.value;
+  const state = stateEl.value.trim();
+  const source = sourceInfo ? sourceInfo.value : 'Website';
+
+  if (!name) { alert('Please enter your full name.'); return; }
+  if (phone.length < 10) { alert('Please enter a valid 10-digit phone number.'); return; }
+  if (!age) { alert('Please enter your age.'); return; }
+  if (!gender) { alert('Please select your gender.'); return; }
+  if (!profession) { alert('Please select your current status.'); return; }
+  if (!state) { alert('Please enter your state.'); return; }
+
+  // Send to Google Sheets
   const formData = new FormData();
   formData.append('name', name);
   formData.append('phone', phone);
@@ -841,26 +857,61 @@ mainForm.addEventListener('submit', function(e) {
   formData.append('source', source);
   formData.append('timestamp', new Date().toISOString());
 
-  fetch(SCRIPT_URL, {
-    method: 'POST',
-    mode: 'no-cors',
-    body: formData
-  }).catch((error) => {
-    console.error('Sheet error:', error);
-  });
-
-  if (typeof fbq !== 'undefined') {
-    fbq('track', 'Contact');
+  if (SCRIPT_URL && SCRIPT_URL.includes('google.com')) {
+    fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: formData })
+      .catch(err => console.log('Sheet save error:', err));
   }
 
-  const message = encodeURIComponent(
-    `Hello Raviraj Sir! 👋*\n\nI'm interested in learning Digital Skills and building my career in the digital field. 🚀\n\n🔹 Name: ${name}\n🔹 Phone: ${phone}\n🔹 Age: ${age}\n🔹 Gender: ${gender}\n🔹 Status: ${profession}\n🔹 District: ${district}\n\nI'm excited to start my journey. Please share the next steps!\n\nThank you! 🙏`
-  );
+  // Meta Pixel
+  if (typeof fbq !== 'undefined') {
+    try { fbq('track', 'Contact'); } catch(err) {}
+  }
 
-  window.open(`https://wa.me/${WA_NUMBER_INT}?text=${message}`, '_blank');
+  // WhatsApp redirect
+  const messageText = "Hello Raviraj Sir! 👋*
+
+"
+    + "I'm interested in learning Digital Skills and building my career in the digital field. 🚀
+
+"
+    + "🔹 Name: " + name + "
+"
+    + "🔹 Phone: " + phone + "
+"
+    + "🔹 Age: " + age + "
+"
+    + "🔹 Gender: " + gender + "
+"
+    + "🔹 Status: " + profession + "
+"
+    + "🔹 State: " + state + "
+
+"
+    + "I'm excited to start my journey. Please share the next steps!
+
+"
+    + "Thank you! 🙏";
+
+  const waUrl = "https://wa.me/" + WA_NUMBER_INT + "?text=" + encodeURIComponent(messageText);
+  window.open(waUrl, '_blank');
 
   closeForm();
-});
+}
+
+// Bind form submit
+if (mainForm) {
+  mainForm.addEventListener('submit', handleFormSubmit);
+}
+
+// Also bind direct click to submit button as fallback
+const submitBtn = document.querySelector('.btn-submit');
+if (submitBtn) {
+  submitBtn.addEventListener('click', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    handleFormSubmit(e);
+  });
+}
 
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
   anchor.addEventListener('click', function(e) {
