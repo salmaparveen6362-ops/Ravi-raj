@@ -228,6 +228,7 @@
 <base target="_blank">
 <base target="_blank">
 <base target="_blank">
+<base target="_blank">
 </head>
 <body>
 
@@ -697,7 +698,7 @@
 <script>
 lucide.createIcons();
 
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz044nPSDdmX7I4VkylzJwgO__TQcGu7T-4NfFHPdYlwaAxiisBI9GaWdX-rEWbTxUXiw/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzAJkebZw62xKLRuoZPDdIBkqQBEdsxSrKYwrhMRq2Jq85OtV-cYl86Vhed56ILky0/exec";
 
 function updateCountdown() {
   const now = new Date();
@@ -833,28 +834,34 @@ mainForm.addEventListener('submit', function(e) {
     return;
   }
 
-  // 1. Send to Google Sheets (fire and forget)
-  const formData = new FormData();
-  formData.append('name', name);
-  formData.append('phone', phone);
-  formData.append('age', age);
-  formData.append('gender', gender);
-  formData.append('profession', profession);
-  formData.append('state', state);
-  formData.append('source', source);
-  formData.append('timestamp', new Date().toISOString());
+  // 1. Send to Google Sheets using URLSearchParams (x-www-form-urlencoded)
+  const params = new URLSearchParams();
+  params.append('name', name);
+  params.append('phone', phone);
+  params.append('age', age);
+  params.append('gender', gender);
+  params.append('profession', profession);
+  params.append('state', state);
+  params.append('source', source);
+  params.append('timestamp', new Date().toISOString());
+
+  console.log('[LEAD] Sending to sheet:', Object.fromEntries(params));
 
   fetch(SCRIPT_URL, {
     method: 'POST',
     mode: 'no-cors',
-    body: formData
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: params.toString()
+  }).then(() => {
+    console.log('[LEAD] Sheet request sent successfully');
   }).catch((error) => {
-    console.error('Sheet error:', error);
+    console.error('[LEAD] Sheet error:', error);
   });
 
   // 2. Meta Pixel - Contact event (fires every time)
   if (typeof fbq !== 'undefined') {
     fbq('track', 'Contact');
+    console.log('[PIXEL] Contact event fired');
   }
 
   // 3. WhatsApp redirect with properly formatted message
@@ -871,6 +878,7 @@ mainForm.addEventListener('submit', function(e) {
     "Thank you! 🙏"
   );
 
+  console.log('[LEAD] Opening WhatsApp...');
   window.open("https://wa.me/" + WA_NUMBER_INT + "?text=" + message, '_blank');
 
   closeForm();
