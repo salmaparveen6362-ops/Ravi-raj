@@ -679,10 +679,6 @@
             </select>
           </div>
           <div class="col-12">
-            <label class="form-label">State *</label>
-            <input id="inp_state" type="text" class="form-control" required placeholder="Enter your state (e.g. Gujarat, Maharashtra)">
-          </div>
-          <div class="col-12">
             <button type="submit" class="btn-submit">
               <i data-lucide="send" style="width:18px;vertical-align:middle;margin-right:8px;"></i>
               Send & Connect on WhatsApp
@@ -702,7 +698,7 @@ try {
   console.error('[ICONS] lucide failed to load, continuing without icons:', err);
 }
 
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzAJkebZw62xKLRuoZPDdIBkqQBEdsxSrKYwrhMRq2Jq85OtV-cYl86Vhed56ILky0/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyfEDFzzpIfCu8yGOYAiTZVEAuKYhD_y6L9PRlyaUBTxxeFttT9Rsw-Vn6CLVHwPAs/exec";
 
 function updateCountdown() {
   const now = new Date();
@@ -830,10 +826,9 @@ mainForm.addEventListener('submit', function(e) {
   const age = document.getElementById('inp_age').value;
   const gender = document.getElementById('inp_gender').value;
   const profession = document.getElementById('inp_profession').value;
-  const state = document.getElementById('inp_state').value.trim();
   const source = sourceInfo.value || 'Website';
 
-  if (!name || phone.length < 10 || !age || !gender || !profession || !state) {
+  if (!name || phone.length < 10 || !age || !gender || !profession) {
     alert('Please fill all fields correctly with a valid 10-digit phone number.');
     return;
   }
@@ -845,7 +840,6 @@ mainForm.addEventListener('submit', function(e) {
   params.append('age', age);
   params.append('gender', gender);
   params.append('profession', profession);
-  params.append('state', state);
   params.append('source', source);
   params.append('timestamp', new Date().toISOString());
 
@@ -876,8 +870,7 @@ mainForm.addEventListener('submit', function(e) {
     "🔹 Phone: " + phone + "\n" +
     "🔹 Age: " + age + "\n" +
     "🔹 Gender: " + gender + "\n" +
-    "🔹 Status: " + profession + "\n" +
-    "🔹 State: " + state + "\n\n" +
+    "🔹 Status: " + profession + "\n\n" +
     "I'm excited to start my journey. Please share the next steps!\n\n" +
     "Thank you! 🙏"
   );
